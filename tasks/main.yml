@@ -1,0 +1,45 @@
+---
+# tasks file for ansible-role-selenium
+- name: Install Firefox and X serve
+  apt: name={{ item }} update_cache=true
+  with_items:
+    - xvfb
+    - firefox
+
+- name: Determine what the latest Selenium version with_items
+  shell: curl "https://selenium-release.storage.googleapis.com/" | perl -n -e'/.*<Key>([^>]+selenium-server-standalone[^<]+)/ && print $1'
+  register: selenium_version_output
+  tags: register
+
+- name: Fetch selenium-server-standalone jar
+  get_url:
+    url: 'https://selenium-release.storage.googleapis.com/{{ selenium_version_output.stdout }}'
+    dest: '{{ user_home_path }}/selenium-server-standalone.jar'
+
+- name: Set proper owner for selenium-server-standalone jar
+  file:
+    path: '{{ user_home_path }}/selenium-server-standalone.jar'
+    owner: '{{ username }}'
+    group: '{{ group_name }}'
+
+    - name: Fetch geckodriver
+      get_url:
+        url: https://github.com/mozilla/geckodriver/releases/download/v0.15.0/geckodriver-v0.15.0-linux64.tar.gz
+        dest: '{{ user_home_path }}/geckodriver.tar.gz'
+
+    - name: Unarchive the geckodriver
+      unarchive:
+        remote_src: true
+        src: '{{ user_home_path }}/geckodriver.tar.gz'
+        dest: '{{ user_home_path }}'
+        mode: 'u+x'
+
+    - name: Copy geckodriver to /usr/bin to make it available as an executable
+      become: true
+      copy:
+        remote_src: true
+        src: '{{ user_home_path }}/geckodriver'
+        dest: /usr/bin
+
+    - name: Run Xvfb in theb background
+      shell: export DISPLAY=:10 && Xvfb :10 -ac &

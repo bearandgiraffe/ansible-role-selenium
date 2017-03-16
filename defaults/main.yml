@@ -1,0 +1,5 @@
+---
+# defaults file for ansible-role-selenium
+username:       vagrant
+group_name:     '{{ username }}'
+user_home_path: '/home/{{ username }}'
