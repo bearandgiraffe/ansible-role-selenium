@@ -22,24 +22,24 @@
     owner: '{{ username }}'
     group: '{{ group_name }}'
 
-    - name: Fetch geckodriver
-      get_url:
-        url: https://github.com/mozilla/geckodriver/releases/download/v0.15.0/geckodriver-v0.15.0-linux64.tar.gz
-        dest: '{{ user_home_path }}/geckodriver.tar.gz'
+- name: Fetch geckodriver
+  get_url:
+    url: https://github.com/mozilla/geckodriver/releases/download/v0.15.0/geckodriver-v0.15.0-linux64.tar.gz
+    dest: '{{ user_home_path }}/geckodriver.tar.gz'
 
-    - name: Unarchive the geckodriver
-      unarchive:
-        remote_src: true
-        src: '{{ user_home_path }}/geckodriver.tar.gz'
-        dest: '{{ user_home_path }}'
-        mode: 'u+x'
+- name: Unarchive the geckodriver
+  unarchive:
+    remote_src: true
+    src: '{{ user_home_path }}/geckodriver.tar.gz'
+    dest: '{{ user_home_path }}'
+    mode: 'u+x'
 
-    - name: Copy geckodriver to /usr/bin to make it available as an executable
-      become: true
-      copy:
-        remote_src: true
-        src: '{{ user_home_path }}/geckodriver'
-        dest: /usr/bin
+- name: Copy geckodriver to /usr/bin to make it available as an executable
+  become: true
+  copy:
+    remote_src: true
+    src: '{{ user_home_path }}/geckodriver'
+    dest: /usr/bin
 
-    - name: Run Xvfb in theb background
-      shell: export DISPLAY=:10 && Xvfb :10 -ac &
+- name: Run Xvfb in theb background
+  shell: export DISPLAY=:10 && Xvfb :10 -ac &
